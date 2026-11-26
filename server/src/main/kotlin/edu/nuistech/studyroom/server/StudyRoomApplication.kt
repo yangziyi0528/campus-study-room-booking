@@ -12,6 +12,7 @@ class StudyRoomApplication {
     fun campusClock(): Clock = Clock.system(ZoneId.of("Asia/Shanghai"))
 }
 
+@Suppress("SpreadOperator") // Forward the process arguments once to Spring Boot's vararg entry point.
 fun main(args: Array<String>) {
     runApplication<StudyRoomApplication>(*args)
 }

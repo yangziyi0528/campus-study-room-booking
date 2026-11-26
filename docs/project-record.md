@@ -7,3 +7,6 @@
 - Divided the code into a shared API contract, a REST server, and a command-line client. The local prototype will work with fictional study rooms and booking IDs.
 - Started the Gradle Wrapper build. One team repository will record actual member contributions, reviews, workflow runs, and releases once the group creates it.
 - Codex assisted with the initial local implementation and project documentation.
+- Implemented and verified the API, transactional H2 storage, and CLI. Added local endpoint and concurrency tests alongside command-line tests.
+- Chose the room/status/start index after the 50,000-row probe returned the same 125 bookings while reducing the scan count from 50,001 to 126.
+- Added a workflow for pull-request checks and tag-driven releases. GitHub-hosted checks, the project board, member reviews, and the formal release await the team repository.

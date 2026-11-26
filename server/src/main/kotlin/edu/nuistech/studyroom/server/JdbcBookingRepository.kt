@@ -14,7 +14,9 @@ import java.util.UUID
 
 @Repository
 class JdbcBookingRepository(private val jdbc: JdbcTemplate) : BookingRepository {
-    private val roomRow = RowMapper { row, _ -> Room(row.getString("id"), row.getString("name"), row.getInt("capacity")) }
+    private val roomRow = RowMapper { row, _ ->
+        Room(row.getString("id"), row.getString("name"), row.getInt("capacity"))
+    }
     private val bookingRow = RowMapper { row, _ ->
         Booking(
             row.getObject("id", UUID::class.java), row.getString("room_id"), row.getString("student_id"),
@@ -43,8 +45,14 @@ class JdbcBookingRepository(private val jdbc: JdbcTemplate) : BookingRepository 
             RowMapper { row, _ -> row.getObject(1, UUID::class.java) },
             request.roomId, request.start.toLocalDate().atStartOfDay(), request.end, request.start,
         ).isNotEmpty()
-        if (conflict) throw BookingFailure(BookingError.BOOKING_CONFLICT, "That room is already booked during the requested time.")
-        val booking = Booking(UUID.randomUUID(), request.roomId, request.studentId, request.start, request.end, BookingStatus.ACTIVE)
+        if (conflict) {
+            throw BookingFailure(
+                BookingError.BOOKING_CONFLICT, "That room is already booked during the requested time.",
+            )
+        }
+        val booking = Booking(
+            UUID.randomUUID(), request.roomId, request.studentId, request.start, request.end, BookingStatus.ACTIVE,
+        )
         jdbc.update(
             "INSERT INTO bookings (id, room_id, student_id, start_at, end_at, status) VALUES (?, ?, ?, ?, ?, ?)",
             booking.id, booking.roomId, booking.studentId, booking.start, booking.end, booking.status.name,
@@ -69,7 +77,9 @@ class JdbcBookingRepository(private val jdbc: JdbcTemplate) : BookingRepository 
 
     private fun lockRoom(roomId: String) {
         // Taking the same row lock before checking and writing prevents simultaneous double-booking.
-        val present = jdbc.query("SELECT id FROM rooms WHERE id = ? FOR UPDATE", RowMapper { row, _ -> row.getString(1) }, roomId)
+        val present = jdbc.query(
+            "SELECT id FROM rooms WHERE id = ? FOR UPDATE", RowMapper { row, _ -> row.getString(1) }, roomId,
+        )
         if (present.isEmpty()) throw BookingFailure(BookingError.ROOM_NOT_FOUND, "Room $roomId was not found.")
     }
 

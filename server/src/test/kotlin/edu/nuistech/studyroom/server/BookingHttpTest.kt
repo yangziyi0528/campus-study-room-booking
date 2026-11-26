@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["spring.datasource.url=jdbc:h2:mem:booking-http;DB_CLOSE_DELAY=-1"],
 )
-class BookingHttpTest(@Autowired private val http: TestRestTemplate) {
+class BookingHttpTest(@param:Autowired private val http: TestRestTemplate) {
     private val today = LocalDate.now(ZoneId.of("Asia/Shanghai"))
 
     @Test
@@ -43,7 +43,8 @@ class BookingHttpTest(@Autowired private val http: TestRestTemplate) {
         val conflict = create(request.copy(studentId = "S2", start = request.start.plusMinutes(30)))
         assertEquals(HttpStatus.CONFLICT, conflict.statusCode)
         assertEquals("BOOKING_CONFLICT", conflict.body!!["code"].asText())
-        assertEquals(HttpStatus.CREATED, create(request.copy(start = request.end, end = request.end.plusHours(1))).statusCode)
+        val adjacent = request.copy(start = request.end, end = request.end.plusHours(1))
+        assertEquals(HttpStatus.CREATED, create(adjacent).statusCode)
     }
 
     @Test
@@ -92,6 +93,7 @@ class BookingHttpTest(@Autowired private val http: TestRestTemplate) {
 
     private fun create(request: NewBooking) = http.postForEntity("/api/v1/bookings", request, JsonNode::class.java)
 
-    private fun cancel(id: String, student: String) =
-        http.exchange("/api/v1/bookings/$id?studentId=$student", HttpMethod.DELETE, HttpEntity.EMPTY, JsonNode::class.java)
+    private fun cancel(id: String, student: String) = http.exchange(
+        "/api/v1/bookings/$id?studentId=$student", HttpMethod.DELETE, HttpEntity.EMPTY, JsonNode::class.java,
+    )
 }

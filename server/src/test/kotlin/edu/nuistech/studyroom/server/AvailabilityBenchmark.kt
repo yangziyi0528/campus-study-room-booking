@@ -59,24 +59,21 @@ private fun seed(connection: Connection, dayOne: LocalDate) {
 }
 
 private fun measure(jdbc: JdbcTemplate, date: LocalDate): Measurement {
-    val parameters = arrayOf("R101", date.atStartOfDay(), date.plusDays(1).atStartOfDay())
+    val from = date.atStartOfDay()
+    val until = date.plusDays(1).atStartOfDay()
     val query = JdbcBookingRepository.DAILY_BOOKINGS
-    repeat(WARMUP_RUNS) { jdbc.queryForList(query, *parameters) }
+    repeat(WARMUP_RUNS) { jdbc.queryForList(query, "R101", from, until) }
     var rows = 0
     val times = List(RUNS) {
         val start = System.nanoTime()
-        rows = jdbc.queryForList(query, *parameters).size
+        rows = jdbc.queryForList(query, "R101", from, until).size
         (System.nanoTime() - start) / 1_000_000.0
     }.sorted()
-    val plan = jdbc.queryForObject("EXPLAIN ANALYZE $query", String::class.java, *parameters).orEmpty()
+    val plan = jdbc.queryForObject("EXPLAIN ANALYZE $query", String::class.java, "R101", from, until).orEmpty()
     val scanned = Regex("scanCount:\\s*(\\d+)").find(plan)?.groupValues?.get(1) ?: "not reported"
     return Measurement(rows, (times[RUNS / 2 - 1] + times[RUNS / 2]) / 2, scanned)
 }
 
 private fun printResult(label: String, result: Measurement) {
-    printf("%-20s %7d %14.3f %15s%n", label, result.rows, result.medianMs, result.scanned)
-}
-
-private fun printf(format: String, vararg values: Any) {
-    System.out.printf(Locale.ROOT, format, *values)
+    System.out.printf(Locale.ROOT, "%-20s %7d %14.3f %15s%n", label, result.rows, result.medianMs, result.scanned)
 }

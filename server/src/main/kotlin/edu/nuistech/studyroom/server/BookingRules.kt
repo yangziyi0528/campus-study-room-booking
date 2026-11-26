@@ -36,7 +36,7 @@ internal object BookingRules {
         if (start.toLocalTime() < open || end.toLocalTime() > close) {
             invalid("Choose a time between 08:00 and 22:00, campus time.")
         }
-        if (start.second != 0 || start.nano != 0 || end.second != 0 || end.nano != 0) {
+        if (start != start.truncatedTo(ChronoUnit.MINUTES) || end != end.truncatedTo(ChronoUnit.MINUTES)) {
             invalid("Choose start and end times at whole minutes.")
         }
         if (start <= now) invalid("The start time must be in the future.")

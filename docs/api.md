@@ -18,4 +18,6 @@ Example request
 
 Bookings start in the future, stay within one day from 08:00 to 22:00, and start and end on whole minutes. Time ranges are half-open. An interval ending at 10:00 leaves a new interval starting at 10:00 available. The server returns a 409 error if another active booking overlaps.
 
+Room and student IDs are case-insensitive and contain one to 30 letters, digits, or hyphens. The first character is a letter or digit. For today's date, availability starts at the next whole minute or at opening time, whichever comes later.
+
 Error responses contain a stable `code` and an English `message`. Invalid parameters or JSON return 400 (`INVALID_REQUEST`), unknown rooms and bookings return 404, and conflicting reservations return 409 (`BOOKING_CONFLICT`). Cancelling with a mismatched student ID returns 404.
