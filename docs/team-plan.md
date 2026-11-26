@@ -7,3 +7,9 @@
 | 20% | CLI, release packaging, and generated release notes | CLI changes and tests, tag workflow, and released artifacts |
 
 Use one GitHub repository. Each member uses their own account and reviews another member's pull request. The project board tracks task, owner, and status. Update the project record weekly with decisions, actual progress, and links to evidence. Each member writes their contribution statement from the work they performed.
+
+## Suggested review handoff
+
+- **50%**. Review `BookingRules.kt`, `BookingController.kt`, and the API documentation. Check the HTTP contract and coordinate the end-to-end run. Own the build check and branch protection in the team repository.
+- **30%**. Review `JdbcBookingRepository.kt`, the SQL schema, and the concurrency test. Reproduce the performance probe and explain the measured result.
+- **20%**. Review the `cli` module, the packaged command examples, and the tag-driven release job. Verify the release assets and generated notes on GitHub.

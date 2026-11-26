@@ -10,3 +10,4 @@
 - Implemented and verified the API, transactional H2 storage, and CLI. Added local endpoint and concurrency tests alongside command-line tests.
 - Chose the room/status/start index after the 50,000-row probe returned the same 125 bookings while reducing the scan count from 50,001 to 126.
 - Added a workflow for pull-request checks and tag-driven releases. GitHub-hosted checks, the project board, member reviews, and the formal release await the team repository.
+- Built a clean clone with the checked-in dependency locks. All 13 JUnit tests passed, and Detekt reported no findings. A separate run from the packaged JAR and CLI ZIP passed 10 checks, including persistence across a server restart.
