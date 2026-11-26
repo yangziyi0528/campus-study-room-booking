@@ -18,3 +18,11 @@ dependencies {
 springBoot { mainClass = 'edu.nuistech.studyroom.server.StudyRoomApplicationKt' }
 tasks.named('bootJar') { archiveFileName.set('study-room-server.jar') }
 tasks.named('jar') { enabled = false }
+
+tasks.register('benchmark', JavaExec) {
+    group = 'verification'
+    description = 'Measure the room/day query with and without its composite index.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'edu.nuistech.studyroom.server.AvailabilityBenchmarkKt'
+}

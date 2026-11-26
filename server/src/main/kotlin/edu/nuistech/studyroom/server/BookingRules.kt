@@ -16,10 +16,11 @@ class BookingFailure(val code: BookingError, message: String) : RuntimeException
 internal object BookingRules {
     private val open = LocalTime.of(8, 0)
     private val close = LocalTime.of(22, 0)
+    private val idPattern = Regex("[A-Z0-9][A-Z0-9-]{0,29}")
 
     fun identifier(value: String, field: String): String {
         val normalized = value.trim().uppercase(Locale.ROOT)
-        if (!normalized.matches(Regex("[A-Z0-9][A-Z0-9-]{0,29}"))) {
+        if (!normalized.matches(idPattern)) {
             invalid("$field must be 1 to 30 letters, digits, or hyphens and start with a letter or digit.")
         }
         return normalized
@@ -28,6 +29,7 @@ internal object BookingRules {
     fun validate(request: NewBooking, now: LocalDateTime): NewBooking {
         val start = request.start
         val end = request.end
+        validateDate(start.toLocalDate())
         if (start.toLocalDate() != end.toLocalDate() || start >= end) {
             invalid("Start and end must be on the same date and end must be after start.")
         }
@@ -38,7 +40,14 @@ internal object BookingRules {
             invalid("Choose start and end times at whole minutes.")
         }
         if (start <= now) invalid("The start time must be in the future.")
-        return request.copy(roomId = identifier(request.roomId, "Room ID"), studentId = identifier(request.studentId, "Student ID"))
+        return request.copy(
+            roomId = identifier(request.roomId, "Room ID"),
+            studentId = identifier(request.studentId, "Student ID"),
+        )
+    }
+
+    fun validateDate(date: LocalDate) {
+        if (date.year !in 1..9999) invalid("Use a four-digit year between 0001 and 9999.")
     }
 
     fun freeSlots(date: LocalDate, now: LocalDateTime, reservations: List<Booking>): List<TimeSlot> {

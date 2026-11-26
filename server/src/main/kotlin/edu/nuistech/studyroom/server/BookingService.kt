@@ -13,6 +13,7 @@ class BookingService(private val repository: BookingRepository, private val cloc
     fun rooms() = repository.rooms()
 
     fun availability(roomId: String, date: LocalDate): Availability {
+        BookingRules.validateDate(date)
         val id = BookingRules.identifier(roomId, "Room ID")
         val room = repository.room(id) ?: throw BookingFailure(BookingError.ROOM_NOT_FOUND, "Room $id was not found.")
         val now = LocalDateTime.now(clock)
