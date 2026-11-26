@@ -26,9 +26,11 @@ Each fictional room is booked as a unit from 08:00 to 22:00 in Asia/Shanghai tim
 | Client | Kotlin, Picocli, Java HTTP client and shared model classes |
 | Quality checks | JUnit unit and integration tests and Detekt static analysis |
 
+H2 was selected to exercise SQL transactions and preserve reservations on disk without provisioning a separate database server. The Gradle Wrapper and dependency locks keep the build consistent when it is run from a new checkout. GitHub Actions is configured to run the same Gradle checks before packaging a tagged release, so the release job depends on a successful build, test run, and Detekt analysis.
+
 ### 2.1 Reproduce the local run
 
-From the repository root, run `.\gradlew.bat clean build` and start the executable JAR in `server/build/libs`. Extract the CLI ZIP from `cli/build/distributions`, then run `study-room rooms` from its `bin` folder to check connectivity. The README lists the full Windows commands and booking examples.
+From the repository root, run `.\gradlew.bat clean build` and start the executable JAR in `server/build/libs`. Extract the CLI ZIP from `cli/build/distributions`, then run `.\study-room.bat rooms` in PowerShell from its `bin` folder to check connectivity. The README lists the full commands and booking examples.
 
 <div class="page-break"></div>
 
