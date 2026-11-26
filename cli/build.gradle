@@ -1,0 +1,16 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':contract')
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.21.4')
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'info.picocli:picocli:4.7.7'
+}
+
+application {
+    mainClass = 'edu.nuistech.studyroom.cli.StudyRoomCliKt'
+    applicationName = 'study-room'
+}
