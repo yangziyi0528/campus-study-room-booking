@@ -1,2 +1,12 @@
+pluginManagement {
+    repositories {
+        if (System.getenv('GITHUB_ACTIONS') == 'true') {
+            maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }
+            mavenCentral()
+        }
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'campus-study-room-booking'
 include 'contract', 'server', 'cli'
