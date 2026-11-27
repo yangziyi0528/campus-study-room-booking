@@ -5,6 +5,7 @@ data/
 *.mv.db
 *.trace.db
 output/
+release-staging/
 .idea/
 *.iml
 .vscode/

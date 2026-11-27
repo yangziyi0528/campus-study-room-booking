@@ -1,0 +1,65 @@
+name: Build and release
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Gradle quality gate
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - name: Build, test, and run Detekt
+        run: ./gradlew --no-daemon clean build
+      - name: Stage release files
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          mkdir -p release-staging
+          cp server/build/libs/study-room-server.jar cli/build/distributions/study-room-cli.zip release-staging/
+      - name: Store release artifacts
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: study-room-release
+          if-no-files-found: error
+          path: release-staging/
+
+  release:
+    name: Publish versioned release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify tag format and reviewed ancestry
+        run: |
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          git merge-base --is-ancestor HEAD origin/main
+      - uses: actions/download-artifact@v4
+        with:
+          name: study-room-release
+          path: release-artifacts
+      - name: Publish GitHub Release with generated notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            release-artifacts/study-room-server.jar \
+            release-artifacts/study-room-cli.zip \
+            --verify-tag --generate-notes
